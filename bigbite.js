@@ -85,7 +85,7 @@ function () {
 			cancelEvent(event);
 			return;
 		}
-		//table.classList.add("BigBiteUnselectable");
+		table.classList.add("BigBiteUnselectable");
 		set(cell);
 		cancelEvent(event);
 	};
@@ -96,28 +96,27 @@ function () {
 				order[order.length] = key;
 			}
 			order.sort();
-			var currentRowId, order = [], line = 0, colId = 0;
+			var currentRowId, dest = [], line = 0, colId = 0;
 			for (var i = 0, len = order.length; i < len; i++) {
 				var rowId = toPos(order[i]).y;
 				if (currentRowId == null) {
 					currentRowId = rowId;
 				}
-				var text = data[order[i]].trim();
 				if (currentRowId != rowId) {
 					// 改行
 					currentRowId = rowId;
 					line++;
 					colId = 0;
 				}
-				if (!order[line]) {
-					order[line] = [];
+				if (!dest[line]) {
+					dest[line] = [];
 				}
-				order[line][colId++] = text;
+				dest[line][colId++] = data[order[i]].trim();
 			}
 
 			var text = "";
-			for (var y = 0; y < order.length; y++) {
-				text += order[y].join("\t") + "\r\n";
+			for (var y = 0; y < dest.length; y++) {
+				text += dest[y].join("\t") + "\r\n";
 			}
 			event.clipboardData.setData("text", text.slice(0, -2));
 			reset();
