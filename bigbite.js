@@ -1,4 +1,4 @@
-function () {
+(function () {
 
 	var table, start, end, data = {};
 	var cancelEvent = function (e) {
@@ -165,3 +165,4 @@ function () {
 	}
 	init(window, document);
 }
+)();
