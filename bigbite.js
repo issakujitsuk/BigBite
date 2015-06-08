@@ -143,9 +143,8 @@
 				unset(pos.x, pos.y);
 			} else {
 				// to selected
-				var td = table.rows[pos.y].cells[pos.x];
-				data[id] = td.textContent;
-				td.classList.add(SELECTED_CELL);
+				data[id] = 1;
+				table.rows[pos.y].cells[pos.x].classList.add(SELECTED_CELL);
 			}
 		}
 		latest = currentId;
@@ -153,32 +152,39 @@
 
 	};
 
+	var compare = function(a, b) {
+		if (a.y === b.y) {
+			return a.x - b.x;
+		} else {
+			return a.y - b.y
+		}
+	};
+
 	var copy = function(event) {
 		if (data) {
 			// data sort
 			var order = [];
 			for (var key in data) {
-				order[order.length] = key;
+				order[order.length] = toPos(key);
 			}
-			order.sort();
+			order.sort(compare);
 
 			// format
 			var currentRowId, dest = [], line = 0, colId = 0;
 			for (var i = 0, o; o = order[i]; i++) {
-				var rowId = toPos(o).y;
 				if (currentRowId == null) {
-					currentRowId = rowId;
+					currentRowId = o.y;
 				}
-				if (currentRowId !== rowId) {
+				if (currentRowId !== o.y) {
 					// newline
-					currentRowId = rowId;
+					currentRowId = o.y;
 					line++;
 					colId = 0;
 				}
 				if (!dest[line]) {
 					dest[line] = [];
 				}
-				dest[line][colId++] = data[o].trim();
+				dest[line][colId++] = table.rows[o.y].cells[o.x].textContent.trim();
 			}
 
 			// to string
