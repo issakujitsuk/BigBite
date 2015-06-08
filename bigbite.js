@@ -6,6 +6,9 @@
 	start, // drag start-id
 	latest, // drag latest-id
 	data = {};	// selected data
+	const
+	UNSELECTABLE_TABLE = "BigBiteUnselectable",
+	SELECTED_CELL = "BigBiteSelected";
 
 	var cancelEvent = function (e) {
 		e.stopPropagation();
@@ -20,7 +23,7 @@
 		}
 		// selectable
 		if (table) {
-			table.classList.remove("BigBiteUnselectable");
+			table.classList.remove(UNSELECTABLE_TABLE);
 		}
 		table = start = latest = null;
 		data = {};
@@ -81,7 +84,7 @@
 				// to selected
 				var td = table.rows[pos.y].cells[pos.x];
 				data[id] = td.textContent;
-				td.classList.add("BigBiteSelected");
+				td.classList.add(SELECTED_CELL);
 			}
 		}
 		latest = currentId;
@@ -89,12 +92,11 @@
 	};
 
 	var unset = function(x, y) {
-		table.rows[y].cells[x].classList.remove("BigBiteSelected");
+		table.rows[y].cells[x].classList.remove(SELECTED_CELL);
 	};
 
 	var getCell = function (event) {
-		var o = {};
-		var e = event.target;
+		var o = {}, e = event.target, name;
 		while (e) {
 			switch ((name = e.nodeName.toLowerCase())) {
 				case "th":
@@ -122,14 +124,6 @@
 		return {x: +pos[1], y: +pos[0]};
 	};
 
-	var getY = function (o) {
-		return o.tr.rowIndex
-	};
-
-	var getX = function (o) {
-		return o.td.cellIndex;
-	};
-
 	var move = function (event) {
 		if (!event.ctrlKey || event.which !== 1) {
 			return;
@@ -142,7 +136,7 @@
 		if (!table) {
 			// selection begins
 			table = cell.table;
-			table.classList.add("BigBiteUnselectable");
+			table.classList.add(UNSELECTABLE_TABLE);
 		} else if (table != cell.table) {
 			// new table
 			reset();
@@ -154,10 +148,11 @@
 
 		// update selection
 		update({
-			x: getX(cell),
-			y: getY(cell),
+			x: cell.td.cellIndex,
+			y: cell.tr.rowIndex,
 		});
 	};
+
 	var copy = function(event) {
 		if (data) {
 			// data sort
@@ -233,8 +228,8 @@
 		var style = document.createElement("style");
 		style.type = "text/css";
 		document.getElementsByTagName("head").item(0).appendChild(style);
-		style.sheet.insertRule("table.BigBiteUnselectable{-webkit-user-select:none}", 0);
-		style.sheet.insertRule("th.BigBiteSelected,td.BigBiteSelected{box-shadow:-2px -1px blue inset}", 0);
+		style.sheet.insertRule("." + UNSELECTABLE_TABLE + "{-webkit-user-select:none}", 0);
+		style.sheet.insertRule("." + SELECTED_CELL + "{box-shadow:-2px -1px blue inset}", 0);
 	};
 
 	for (var i = 0, w; w = window.frames[i]; i++) {
