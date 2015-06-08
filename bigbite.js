@@ -52,45 +52,6 @@
 		}
 	};
 
-	var update = function(cursor) {
-		var currentId = toId(cursor.x, cursor.y);
-		if (latest === currentId) {
-			return;
-		}
-
-		if (updating) {
-			return;
-		}
-		updating = true;
-
-		if (start == null) {
-			start = currentId;
-		}
-
-		var startCell = toPos(start);
-		var flip = {};
-		if (latest) {
-			diff(startCell, toPos(latest), flip);
-		}
-		diff(startCell, cursor , flip);
-
-		for (id in flip) {
-			var pos = toPos(id);
-			if (data[id]) {
-				// to unselected
-				delete data[id];
-				unset(pos.x, pos.y);
-			} else {
-				// to selected
-				var td = table.rows[pos.y].cells[pos.x];
-				data[id] = td.textContent;
-				td.classList.add(SELECTED_CELL);
-			}
-		}
-		latest = currentId;
-		updating = false;
-	};
-
 	var unset = function(x, y) {
 		table.rows[y].cells[x].classList.remove(SELECTED_CELL);
 	};
@@ -137,7 +98,7 @@
 			// selection begins
 			table = cell.table;
 			table.classList.add(UNSELECTABLE_TABLE);
-		} else if (table != cell.table) {
+		} else if (table !== cell.table) {
 			// new table
 			reset();
 			cancelEvent(event);
@@ -147,10 +108,49 @@
 		cancelEvent(event);
 
 		// update selection
-		update({
+		var
+		cursor = {
 			x: cell.td.cellIndex,
 			y: cell.tr.rowIndex,
-		});
+		},
+		currentId = toId(cursor.x, cursor.y);
+
+		if (latest === currentId) {
+			return;
+		}
+
+		// exclusive control
+		if (updating) {
+			return;
+		}
+		updating = true;
+
+		if (start == null) {
+			start = currentId;
+		}
+
+		var startCell = toPos(start), flip = {};
+		if (latest) {
+			diff(startCell, toPos(latest), flip);
+		}
+		diff(startCell, cursor , flip);
+
+		for (id in flip) {
+			var pos = toPos(id);
+			if (data[id]) {
+				// to unselected
+				delete data[id];
+				unset(pos.x, pos.y);
+			} else {
+				// to selected
+				var td = table.rows[pos.y].cells[pos.x];
+				data[id] = td.textContent;
+				td.classList.add(SELECTED_CELL);
+			}
+		}
+		latest = currentId;
+		updating = false;
+
 	};
 
 	var copy = function(event) {
@@ -169,7 +169,7 @@
 				if (currentRowId == null) {
 					currentRowId = rowId;
 				}
-				if (currentRowId != rowId) {
+				if (currentRowId !== rowId) {
 					// newline
 					currentRowId = rowId;
 					line++;
