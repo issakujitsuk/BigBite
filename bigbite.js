@@ -1,6 +1,7 @@
 (function () {
 
 	var
+	updating = false,	// exclusive control
 	table, // forcused table
 	start, // drag start-id
 	latest, // drag latest-id
@@ -53,6 +54,12 @@
 		if (latest === currentId) {
 			return;
 		}
+
+		if (updating) {
+			return;
+		}
+		updating = true;
+
 		if (start == null) {
 			start = currentId;
 		}
@@ -78,6 +85,7 @@
 			}
 		}
 		latest = currentId;
+		updating = false;
 	};
 
 	var unset = function(x, y) {
@@ -111,7 +119,7 @@
 
 	var toPos = function(id) {
 		var pos = id.split("-");
-		return {x: pos[1], y: pos[0]};
+		return {x: +pos[1], y: +pos[0]};
 	};
 
 	var getY = function (o) {
@@ -134,6 +142,7 @@
 		if (!table) {
 			// selection begins
 			table = cell.table;
+			table.classList.add("BigBiteUnselectable");
 		} else if (table != cell.table) {
 			// new table
 			reset();
@@ -141,14 +150,13 @@
 			return;
 		}
 
-		table.classList.add("BigBiteUnselectable");
+		cancelEvent(event);
 
 		// update selection
 		update({
 			x: getX(cell),
 			y: getY(cell),
 		});
-		cancelEvent(event);
 	};
 	var copy = function(event) {
 		if (data) {
