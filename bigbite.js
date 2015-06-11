@@ -7,7 +7,6 @@
 	latest, // drag latest-id
 	data = {};	// selected data
 	const
-	UNSELECTABLE_TABLE = "BigBiteUnselectable",
 	SELECTED_CELL = "BigBiteSelected";
 
 	var cancelEvent = function (e) {
@@ -21,10 +20,7 @@
 			var pos = toPos(key);
 			unset(pos.x, pos.y);
 		}
-		// selectable
-		if (table) {
-			table.classList.remove(UNSELECTABLE_TABLE);
-		}
+
 		table = start = latest = null;
 		data = {};
 	};
@@ -90,6 +86,11 @@
 			return;
 		}
 		var cell = getCell(event);
+		if (cell.table) {
+			// on table, default selection event is canceled
+			cancelEvent(event);
+			event.currentTarget.defaultView.getSelection().removeAllRanges();
+		}
 		if (!cell.td) {
 			return;
 		}
@@ -97,15 +98,13 @@
 		if (!table) {
 			// selection begins
 			table = cell.table;
-			table.classList.add(UNSELECTABLE_TABLE);
+
 		} else if (table !== cell.table) {
 			// new table
 			reset();
 			cancelEvent(event);
 			return;
 		}
-
-		cancelEvent(event);
 
 		// update selection
 		var
@@ -234,7 +233,6 @@
 		var style = document.createElement("style");
 		style.type = "text/css";
 		document.getElementsByTagName("head").item(0).appendChild(style);
-		style.sheet.insertRule("." + UNSELECTABLE_TABLE + "{-webkit-user-select:none}", 0);
 		style.sheet.insertRule("." + SELECTED_CELL + "{box-shadow:-2px -1px blue inset}", 0);
 	};
 
