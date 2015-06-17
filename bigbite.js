@@ -160,7 +160,7 @@
 	};
 
 	var copy = function(event) {
-		if (data) {
+		if (Object.keys(data).length) {
 			// data sort
 			var order = [];
 			for (var key in data) {
